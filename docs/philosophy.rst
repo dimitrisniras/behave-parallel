@@ -10,8 +10,8 @@ development (TDD), including acceptance test or customer test driven
 development practices as found in extreme programming. It has `evolved over
 the last few years`__.
 
-__ http://dannorth.net/introducing-bdd
-__ http://forums.pragprog.com/forums/95/topics/3035
+__ https://dannorth.net/introducing-bdd
+__ https://forums.pragprog.com/forums/95/topics/3035
 
 On the "Agile specifications, BDD and Testing eXchange" in November 2009 in
 London, Dan North `gave the following definition of BDD`__:
@@ -21,7 +21,7 @@ London, Dan North `gave the following definition of BDD`__:
   of interactions with well-defined outputs, resulting in the delivery of
   working, tested software that matters.
 
-__ http://skillsmatter.com/podcast/java-jee/how-to-sell-bdd-to-the-business
+__ https://skillsmatter.com/skillscasts/923-how-to-sell-bdd-to-the-business
 
 BDD focuses on obtaining a clear understanding of desired software behavior
 through discussion with stakeholders. It extends TDD by writing test cases
@@ -67,7 +67,7 @@ which accrues once the application is in production. The only way in which
 this benefit can be realized is through the user interface(s) to the
 application, usually (but not always) a GUI.
 
-__ http://lizkeogh.com/2007/06/13/bdd-tdd-done-well/
+__ https://lizkeogh.com/2007/06/13/bdd-tdd-done-well/
 
 In the same way, each piece of code, starting with the UI, can be
 considered a stakeholder of the other modules of code which it uses. Each
@@ -90,7 +90,7 @@ The requirements of a retail application might be, "Refunded or exchanged
 items should be returned to stock." In BDD, a developer or QA engineer
 might clarify the requirements by breaking this down into specific
 examples. The language of the examples below is called Gherkin and is used
-*behave* as well as many other tools.
+by *behave* as well as many other tools.
 
 .. code-block:: gherkin
 
@@ -117,7 +117,7 @@ requirements`__. For instance, a domain expert noticing that refunded items
 are not always returned to stock might reword the requirements as "Refunded
 or replaced items should be returned to stock, unless faulty.".
 
-__ http://dannorth.net/whats-in-a-story
+__ https://dannorth.net/whats-in-a-story
 
 This in turn helps participants to pin down the scope of requirements,
 which leads to better estimates of how long those requirements will take to
@@ -182,15 +182,15 @@ Sometimes the difference between the context, events and outcomes is made more e
 
  class TestWindow(object):
     def test_window_close(self):
-        # given
+        # Given
         window = gui.Window("My Window")
         frame = gui.Frame(window)
- 
+
         # When
         window.close()
- 
+
         # Then
-        assert_(not frame.isVisible())       
+        assert_(not frame.isVisible())
 
 However the example is phrased, the effect describes the behavior of the
 code in question. For instance, from the examples above one can derive:
@@ -216,9 +216,8 @@ interface but more predictable behavior. This is injected into the code
 which needs it, and examples of that code's behavior are written using this
 object instead of the production version.
 
-These objects can either be created by hand, or created using a mocking framework such as mock__.
-
-__ http://pypi.python.org/pypi/mock
+These objects can either be created by hand, or created using a
+mocking framework such as :pypi:`mock`.
 
 Questioning responsibilities in this way, and using mocks to fulfill the
 required roles of collaborating classes, encourages the use of Role-based
@@ -232,5 +231,5 @@ This text is partially taken from the wikipedia text on `Behavior Driven
 Development`_ with modifications where appropriate to be more specific to
 *behave* and Python.
 
-.. _`Behavior Driven Development`: http://en.wikipedia.org/wiki/Behavior_Driven_Development
+.. _`Behavior Driven Development`: https://en.wikipedia.org/wiki/Behavior_Driven_Development
 

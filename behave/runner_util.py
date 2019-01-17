@@ -3,14 +3,17 @@
 Contains utility functions and classes for Runners.
 """
 
-from behave import parser
-from behave.model import FileLocation
+from __future__ import absolute_import
 from bisect import bisect
 import glob
 import os.path
 import re
 import sys
-import types
+from six import string_types
+from behave import parser
+from behave.model_core import FileLocation
+from behave.textutil import ensure_stream_with_encoder
+# LAZY: from behave.step_registry import setup_step_decorators
 
 
 # -----------------------------------------------------------------------------
@@ -31,9 +34,7 @@ class InvalidFilenameError(ValueError):
 # -----------------------------------------------------------------------------
 # CLASS: FileLocationParser
 # -----------------------------------------------------------------------------
-class FileLocationParser:
-    # -- pylint: disable=W0232
-    # W0232: 84,0:FileLocationParser: Class has no __init__ method
+class FileLocationParser(object):
     pattern = re.compile(r"^\s*(?P<filename>.*):(?P<line>\d+)\s*$", re.UNICODE)
 
     @classmethod
@@ -43,10 +44,9 @@ class FileLocationParser:
             filename = match.group("filename").strip()
             line = int(match.group("line"))
             return FileLocation(filename, line)
-        else:
-            # -- NORMAL PATH/FILENAME:
-            filename = text.strip()
-            return FileLocation(filename)
+        # -- NORMAL PATH/FILENAME:
+        filename = text.strip()
+        return FileLocation(filename)
 
     # @classmethod
     # def compare(cls, location1, location2):
@@ -256,8 +256,38 @@ class FeatureListParser(object):
         if not os.path.isfile(filename):
             raise FileNotFoundError(filename)
         here = os.path.dirname(filename) or "."
+        # -- MAYBE BETTER:
+        # contents = codecs.open(filename, "utf-8").read()
         contents = open(filename).read()
         return cls.parse(contents, here)
+
+
+class PathManager(object):
+    """Context manager to add paths to sys.path (python search path)
+    within a scope.
+    """
+
+    def __init__(self, paths=None):
+        self.initial_paths = paths or []
+        self.paths = None
+
+    def __enter__(self):
+        self.paths = list(self.initial_paths)
+        sys.path = self.paths + sys.path
+
+    def __exit__(self, *crap):
+        for path in self.paths:
+            sys.path.remove(path)
+        self.paths = None
+
+    def add(self, path):
+        if self.paths is None:
+            # -- CALLED OUTSIDE OF CONTEXT:
+            self.initial_paths.append(path)
+        else:
+            sys.path.insert(0, path)
+            self.paths.append(path)
+
 
 # -----------------------------------------------------------------------------
 # FUNCTIONS:
@@ -278,7 +308,7 @@ def parse_features(feature_files, language=None):
     features = []
     for location in feature_files:
         if not isinstance(location, FileLocation):
-            assert isinstance(location, basestring)
+            assert isinstance(location, string_types)
             location = FileLocation(os.path.normpath(location))
 
         if location.filename == scenario_collector.filename:
@@ -343,26 +373,92 @@ def collect_feature_locations(paths, strict=True):
     return locations
 
 
-def make_undefined_step_snippet(step, language=None):
-    """
-    Helper function to create an undefined-step snippet for a step.
+def exec_file(filename, globals_=None, locals_=None):
+    if globals_ is None:
+        globals_ = {}
+    if locals_ is None:
+        locals_ = globals_
+    locals_["__file__"] = filename
+    with open(filename, "rb") as f:
+        # pylint: disable=exec-used
+        filename2 = os.path.relpath(filename, os.getcwd())
+        code = compile(f.read(), filename2, "exec", dont_inherit=True)
+        exec(code, globals_, locals_)
 
-    :param step: Step to use (as Step object or step text).
+
+def load_step_modules(step_paths):
+    """Load step modules with step definitions from step_paths directories."""
+    from behave import matchers
+    from behave.step_registry import setup_step_decorators
+    step_globals = {
+        "use_step_matcher": matchers.use_step_matcher,
+        "step_matcher":     matchers.step_matcher, # -- DEPRECATING
+    }
+    setup_step_decorators(step_globals)
+
+    # -- Allow steps to import other stuff from the steps dir
+    # NOTE: Default matcher can be overridden in "environment.py" hook.
+    with PathManager(step_paths):
+        default_matcher = matchers.current_matcher
+        for path in step_paths:
+            for name in sorted(os.listdir(path)):
+                if name.endswith(".py"):
+                    # -- LOAD STEP DEFINITION:
+                    # Reset to default matcher after each step-definition.
+                    # A step-definition may change the matcher 0..N times.
+                    # ENSURE: Each step definition has clean globals.
+                    # try:
+                    step_module_globals = step_globals.copy()
+                    exec_file(os.path.join(path, name), step_module_globals)
+                    matchers.current_matcher = default_matcher
+
+
+def make_undefined_step_snippet(step, language=None):
+    """Helper function to create an undefined-step snippet for a step.
+
+    :param step: Step to use (as Step object or string).
     :param language: i18n language, optionally needed for step text parsing.
     :return: Undefined-step snippet (as string).
     """
-    if isinstance(step, types.StringTypes):
+    if isinstance(step, string_types):
         step_text = step
         steps = parser.parse_steps(step_text, language=language)
         step = steps[0]
         assert step, "ParseError: %s" % step_text
-    prefix = u""
-    if sys.version_info[0] == 2:
-        prefix = u"u"
 
-    schema = u"@%s(%s'%s')\ndef step_impl(context):\n    assert False\n\n"
-    snippet = schema % (step.step_type, prefix, step.name)
+    prefix = u"u"
+    single_quote = "'"
+    if single_quote in step.name:
+        step.name = step.name.replace(single_quote, r"\'")
+
+    schema = u"@%s(%s'%s')\ndef step_impl(context):\n"
+    schema += u"    raise NotImplementedError(%s'STEP: %s %s')\n\n"
+    snippet = schema % (step.step_type, prefix, step.name,
+                        prefix, step.step_type.title(), step.name)
     return snippet
+
+
+def make_undefined_step_snippets(undefined_steps, make_snippet=None):
+    """Creates a list of undefined step snippets.
+    Note that duplicated steps are removed internally.
+
+    :param undefined_steps: List of undefined steps (as Step object or string).
+    :param make_snippet:    Function that generates snippet (optional)
+    :return: List of undefined step snippets (as list of strings)
+    """
+    if make_snippet is None:
+        make_snippet = make_undefined_step_snippet
+
+    # -- NOTE: Remove any duplicated undefined steps.
+    step_snippets = []
+    collected_steps = set()
+    for undefined_step in undefined_steps:
+        if undefined_step in collected_steps:
+            continue
+        collected_steps.add(undefined_step)
+        step_snippet = make_snippet(undefined_step)
+        step_snippets.append(step_snippet)
+    return step_snippets
 
 
 def print_undefined_step_snippets(undefined_steps, stream=None, colored=True):
@@ -380,16 +476,26 @@ def print_undefined_step_snippets(undefined_steps, stream=None, colored=True):
 
     msg = u"\nYou can implement step definitions for undefined steps with "
     msg += u"these snippets:\n\n"
-    printed = set()
-    for step in undefined_steps:
-        if step in printed:
-            continue
-        printed.add(step)
-        msg += make_undefined_step_snippet(step)
+    msg += u"\n".join(make_undefined_step_snippets(undefined_steps))
 
     if colored:
         # -- OOPS: Unclear if stream supports ANSI coloring.
         from behave.formatter.ansi_escapes import escapes
         msg = escapes['undefined'] + msg + escapes['reset']
+
+    stream = ensure_stream_with_encoder(stream)
     stream.write(msg)
     stream.flush()
+
+def reset_runtime():
+    """Reset runtime environment.
+    Best effort to reset module data to initial state.
+    """
+    from behave import step_registry
+    from behave import matchers
+    # -- RESET 1: behave.step_registry
+    step_registry.registry = step_registry.StepRegistry()
+    step_registry.setup_step_decorators(None, step_registry.registry)
+    # -- RESET 2: behave.matchers
+    matchers.ParseMatcher.custom_types = {}
+    matchers.current_matcher = matchers.ParseMatcher

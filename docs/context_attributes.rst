@@ -13,7 +13,11 @@ A context object (:class:`~behave.runner.Context`) is handed to
 Behave Attributes
 -------------------------
 
+<<<<<<< HEAD
 The `behave`_ runner assigns a number of attributes to the context object
+=======
+The :pypi:`behave` runner assigns a number of attributes to the context object
+>>>>>>> v1.2.6
 during a test run.
 
 =============== ========= ============================================= ==============================================================
@@ -64,5 +68,8 @@ Hook    :func:`after_step`          scenario
 Step    Step definition             scenario
 ======= =========================== =======================
 
+<<<<<<< HEAD
 
 .. _behave: http://pypi.python.org/pypi/behave
+=======
+>>>>>>> v1.2.6

@@ -4,9 +4,15 @@ Feature: Test run can be aborted by the user
   I want sometimes to abort a test run (because it is anyway failing, etc.)
   So that I am more productive.
 
+<<<<<<< HEAD
   | NOTES:
   |  * The test runner should fail gracefully (most of the times)
   |  * At least some cleanup hooks should be called (in general)
+=======
+  . NOTES:
+  .  * The test runner should fail gracefully (most of the times)
+  .  * At least some cleanup hooks should be called (in general)
+>>>>>>> v1.2.6
 
 
   @setup
@@ -89,25 +95,45 @@ Feature: Test run can be aborted by the user
   Scenario: Abort test run in before_scenario hook
     Given a file named "features/aborting_in_before_scenario_hook.feature" with:
         """
+<<<<<<< HEAD
         Feature: User aborts test run in before_scenario hook
           Scenario:
+=======
+        Feature: User aborts test run in before_scenario hook of S2
+          Scenario: S1
+>>>>>>> v1.2.6
             Given a step passes
             When another step passes
 
           @user.aborts.before_scenario
+<<<<<<< HEAD
           Scenario: User aborts here
+=======
+          Scenario: S2 -- User aborts here
+>>>>>>> v1.2.6
             Given first step passes
             When second step passes
             Then third step passes
 
+<<<<<<< HEAD
           Scenario:
+=======
+          Scenario: S3
+>>>>>>> v1.2.6
             Then last step passes
         """
     And a file named "features/environment.py" with:
         """
         def before_scenario(context, scenario):
             if "user.aborts.before_scenario" in scenario.tags:
+<<<<<<< HEAD
                 raise KeyboardInterrupt()
+=======
+                user_aborts_testrun_here()
+
+        def user_aborts_testrun_here():
+            raise KeyboardInterrupt()
+>>>>>>> v1.2.6
         """
     When I run "behave -f plain -T features/aborting_in_before_scenario_hook.feature"
     Then it should fail with:
@@ -119,6 +145,7 @@ Feature: Test run can be aborted by the user
         """
     And the command output should contain:
         """
+<<<<<<< HEAD
         Feature: User aborts test run in before_scenario hook
 
           Scenario:
@@ -137,6 +164,17 @@ Feature: Test run can be aborted by the user
             Then last step passes ... passed
         """
     And note that "the second snd third/last scenario is not run"
+=======
+        Feature: User aborts test run in before_scenario hook of S2
+
+          Scenario: S1
+            Given a step passes ... passed
+            When another step passes ... passed
+        """
+    But the command output should not contain "Scenario: S2 -- User aborts here"
+    But the command output should not contain "Scenario: S3"
+    And note that "the second and third scenario is not run"
+>>>>>>> v1.2.6
 
 
   Scenario: Abort test run in after_scenario hook
@@ -210,21 +248,38 @@ Feature: Test run can be aborted by the user
         """
     And a file named "features/environment.py" with:
         """
+<<<<<<< HEAD
         def before_feature(context, feature):
             if "user.aborts.before_feature" in feature.tags:
+=======
+        from __future__ import print_function
+
+        def before_feature(context, feature):
+            if "user.aborts.before_feature" in feature.tags:
+                print("ABORTED in before_feature: %s" % feature.location)
+>>>>>>> v1.2.6
                 raise KeyboardInterrupt()
         """
     When I run "behave -f plain -T features/aborting_in_before_feature_hook.feature"
     Then it should fail with:
         """
+<<<<<<< HEAD
         Feature: User aborts test HERE
+=======
+        ABORTED in before_feature: features/aborting_in_before_feature_hook.feature:2
+>>>>>>> v1.2.6
 
         ABORTED: By user.
         0 features passed, 0 failed, 0 skipped, 1 untested
         0 scenarios passed, 0 failed, 0 skipped, 3 untested
         0 steps passed, 0 failed, 0 skipped, 0 undefined, 6 untested
         """
+<<<<<<< HEAD
     And note that "the feature is not run"
+=======
+    But note that "the feature is not run"
+    And note that "the formatters are not informed of this feature"
+>>>>>>> v1.2.6
 
 
   Scenario: Abort test run in after_feature hook
@@ -278,7 +333,11 @@ Feature: Test run can be aborted by the user
         """
       And the command output should contain:
         """
+<<<<<<< HEAD
         File "{__WORKDIR__}/features/environment.py", line 2, in before_all
+=======
+        File "features/environment.py", line 2, in before_all
+>>>>>>> v1.2.6
           raise KeyboardInterrupt()   #< ABORT-HERE
         """
       And note that "no feature is not run"
@@ -301,7 +360,11 @@ Feature: Test run can be aborted by the user
         """
       And the command output should contain:
         """
+<<<<<<< HEAD
         File "{__WORKDIR__}/features/environment.py", line 2, in after_all
+=======
+        File "features/environment.py", line 2, in after_all
+>>>>>>> v1.2.6
           raise KeyboardInterrupt()   #< ABORT-HERE
         """
       And note that "all features are run"

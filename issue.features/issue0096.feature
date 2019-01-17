@@ -1,6 +1,7 @@
 @issue
 Feature: Issue #96: Sub-steps failed without any error info to help debug issue
 
+<<<<<<< HEAD
     | I am trying to run execute_steps. One of them fails, but the error output
     | from behave has no details whatsoever. It is virtually impossible
     | to figure out why it failed. as no error output is present except the
@@ -18,6 +19,25 @@ Feature: Issue #96: Sub-steps failed without any error info to help debug issue
     |
     |  All we get is the "sub-step failed" but no info whatsoever
     |  as to why it failed...
+=======
+    . I am trying to run execute_steps. One of them fails, but the error output
+    . from behave has no details whatsoever. It is virtually impossible
+    . to figure out why it failed. as no error output is present except the
+    . final error message
+    .
+    .   def before_scenario(context,scenario):
+    .       context.execute_steps(u'''
+    .           When "admin:admin" sends POST "/tasks/testStart"
+    .           Then I expect HTTP code 200
+    .       ''')
+    .
+    . File ".../behave/runner.py", line 262, in execute_steps
+    .  assert False, "FAILED SUB-STEP: %s" % step
+    .  AssertionError: FAILED SUB-STEP: When "admin:admin" sends POST "/tasks/testStart"
+    .
+    .  All we get is the "sub-step failed" but no info whatsoever
+    .  as to why it failed...
+>>>>>>> v1.2.6
 
 
 
@@ -114,9 +134,13 @@ Feature: Issue #96: Sub-steps failed without any error info to help debug issue
         """
         Assertion Failed: FAILED SUB-STEP: When a step fails with stdout "STDOUT: Alice is alive"
         Substep info: Assertion Failed: EXPECT: Step fails with stdout.
+        """
+    And the command output should contain:
+        """
         Captured stdout:
         STDOUT: Alice is alive
         """
+
 
   Scenario: Execute steps and one fails with stderr capture
     Given a file named "features/issue96_case4.feature" with:
@@ -135,6 +159,9 @@ Feature: Issue #96: Sub-steps failed without any error info to help debug issue
         """
         Assertion Failed: FAILED SUB-STEP: When a step fails with stderr "STDERR: Alice is alive"
         Substep info: Assertion Failed: EXPECT: Step fails with stderr.
+        """
+    And the command output should contain:
+        """
         Captured stderr:
         STDERR: Alice is alive
         """
@@ -160,7 +187,11 @@ Feature: Issue #96: Sub-steps failed without any error info to help debug issue
     When I run "behave -c features/issue96_case5.feature"
     Then it should fail with:
         """
+<<<<<<< HEAD
         AssertionError: FAILED SUB-STEP: Then a step fails
+=======
+        HOOK-ERROR in before_scenario: AssertionError: FAILED SUB-STEP: Then a step fails
+>>>>>>> v1.2.6
         Substep info: Assertion Failed: EXPECT: Step fails.
         """
 

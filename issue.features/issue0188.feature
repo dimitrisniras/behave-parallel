@@ -1,5 +1,6 @@
 @issue
 Feature: Issue #188: Better diagnostics if nested step is undefined
+<<<<<<< HEAD
 
   | Currently if nested step has no match, it's shown like this:
   |
@@ -17,6 +18,25 @@ Feature: Issue #188: Better diagnostics if nested step is undefined
   | A slightly different output is provided:
   |
   |     Assertion Failed: UNDEFINED SUB-STEP: When I do strange thign
+=======
+  
+  . Currently if nested step has no match, it's shown like this:
+  .
+  .     Assertion Failed: Sub-step failed: When I do strange thign
+  .     Substep info: None
+  .
+  . Took some time to find that typo.
+  . The suggestion is to fill substep error_message with at least "No match for step"
+  . so it would become:
+  .
+  .     Assertion Failed: Sub-step failed: When I do strange thign
+  .     Substep info: No match for step
+  .
+  . IMPLEMENTATION NOTE:
+  . A slightly different output is provided:
+  .
+  .     Assertion Failed: UNDEFINED SUB-STEP: When I do strange thign
+>>>>>>> v1.2.6
 
 
   Scenario: Nested steps contain an undefined step

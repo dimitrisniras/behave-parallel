@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 @wip
+=======
+>>>>>>> v1.2.6
 Feature: Setup logging subsystem by using a logging configfile
 
   As a tester

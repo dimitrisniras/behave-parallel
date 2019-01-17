@@ -8,6 +8,7 @@ Feature: Issue #175: Scenario isn't marked as 'failed' when Background step fail
   RELATED: features/background.feature
   REUSE:   Scenario from there (as copy).
 
+<<<<<<< HEAD
   | NOTE:
   |     Cucumber has a slightly different behaviour.
   |     When a background step fails the first scenario is marked as failed.
@@ -18,6 +19,18 @@ Feature: Issue #175: Scenario isn't marked as 'failed' when Background step fail
   |
   | SEE ALSO:
   |   * https://github.com/cucumber/cucumber/blob/master/features/docs/gherkin/background.feature
+=======
+  . NOTE:
+  .     Cucumber has a slightly different behaviour.
+  .     When a background step fails the first scenario is marked as failed.
+  .     But the remaining scenarios are marked as skipped.
+  .
+  .     This can lead to problems when you have sporadic background step failures.
+  .     For this reason, behave retries the background steps for each scenario.
+  .
+  . SEE ALSO:
+  .   * https://github.com/cucumber/cucumber/blob/master/features/docs/gherkin/background.feature
+>>>>>>> v1.2.6
 
 
   @setup

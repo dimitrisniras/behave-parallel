@@ -1,5 +1,6 @@
 @issue
 Feature: Issue #177: Cannot setup logging_format
+<<<<<<< HEAD
 
   | DESCPRIPTION:
   |   When the logging_format is set in the behave configuration file
@@ -13,6 +14,21 @@ Feature: Issue #177: Cannot setup logging_format
   | RELATED:
   |   * features/logging.setup_format.feature
   |   * features/logging.setup_level.feature
+=======
+  
+  . DESCPRIPTION:
+  .   When the logging_format is set in the behave configuration file
+  .   or on command-line, an exception is thrown, because
+  .   the ConfigParser tries to replace the placeholders in the format string
+  .   with option values in the configuration file (which do not exist).
+  .
+  . SOLUTION:
+  .   The format string must be processed as raw value (by the ConfigParser).
+  .
+  . RELATED:
+  .   * features/logging.setup_format.feature
+  .   * features/logging.setup_level.feature
+>>>>>>> v1.2.6
 
 
   @reuse.colocated_test
