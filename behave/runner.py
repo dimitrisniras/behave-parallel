@@ -924,7 +924,6 @@ class Runner(ModelRunner):
         if self.step_registry is None:
             self.step_registry = the_step_registry
 
-
         self.joblist_index_queue = multiprocessing.Manager().JoinableQueue()
         self.resultsqueue = multiprocessing.Manager().JoinableQueue()
 
@@ -1080,6 +1079,8 @@ class Runner(ModelRunner):
                     writebuf.write(u"Skipped step because of previous error - Scenario:{0}|step:{1}\n"
                                    .format(current_job.name, step.name))
 
+
+    # MARK
     def countscenariostatus(self, current_job, results):
         if current_job.type != 'scenario':
             [self.countscenariostatus(
@@ -1093,7 +1094,7 @@ class Runner(ModelRunner):
         else:
             for step in current_job.all_steps:
                 #results['steps_' + step.status] += 1
-                results['steps_' + Status.to_name(step.status)] += 1
+                results['steps_' + step.status.name] += 1
 
     def multiproc_fullreport(self):
         metrics = collections.defaultdict(int)
@@ -1110,16 +1111,15 @@ class Runner(ModelRunner):
                 logging.info(e)
 
             # MARK
-            """
             if 'junit_report' in jobresult:
                 junit_report_objs.append(jobresult['junit_report'])
             if jobresult['jobtype'] != 'feature':
                 combined_features_from_scenarios_results[
-                    jobresult['uniquekey']] += '|' + str(jobresult['status']
-                metrics['scenarios_' + jobresult['status']] += 1
+                    jobresult['uniquekey']] += '|' + jobresult['status'].name
+                metrics['scenarios_' + jobresult['status'].name] += 1
             else:
-                metrics['features_' + jobresult['status']] += 1
-            """
+                metrics['features_' + jobresult['status'].name] += 1
+
             metrics['steps_passed'] += jobresult['steps_passed']
             metrics['steps_failed'] += jobresult['steps_failed']
             metrics['steps_skipped'] += jobresult['steps_skipped']
@@ -1156,7 +1156,7 @@ class Runner(ModelRunner):
         report_string = u""
         report_obj['filebasename'] = cj.location.basename()[:-8]
         report_obj['feature_name'] = cj.feature.name        
-        report_obj['status'] = cj.status
+        report_obj['status'] = cj.status.name
         report_obj['duration'] = round(cj.duration,4)
         report_string += '<testcase classname="'
         report_string += report_obj['filebasename']+'.'
@@ -1280,17 +1280,17 @@ class Runner(ModelRunner):
         for uniquekey in feature_reports.keys(): 
             filedata = u"<?xml version='1.0' encoding='UTF-8'?>\n"
             filedata += '<testsuite errors="'
-            filedata += unicode(len(re.findall\
+            filedata += str(len(re.findall\
             ("failed",feature_reports[uniquekey]['statuses'])))
             filedata += '" failures="0" name="'
             filedata += uniquekey+'" '
             filedata += 'skipped="'
-            filedata += unicode(len(re.findall\
+            filedata += str(len(re.findall\
             ("skipped",feature_reports[uniquekey]['statuses'])))
             filedata += '" tests="'
-            filedata += unicode(feature_reports[uniquekey]['total_scenarios'])
+            filedata += str(feature_reports[uniquekey]['total_scenarios'])
             filedata += '" time="'
-            filedata += unicode(round(feature_reports[uniquekey]['duration'],4))
+            filedata += str(round(feature_reports[uniquekey]['duration'],4))
             filedata += '">'
             filedata += "\n\n"
             filedata += feature_reports[uniquekey]['data']
@@ -1305,7 +1305,7 @@ class Runner(ModelRunner):
             filename += feature_reports[uniquekey]['filebasename']
             filename += ".xml"
             fd = open(filename,"w")
-            fd.write(filedata.encode('utf8'))
+            fd.write(filedata)
             fd.close() 
 
     def setup_capture(self):
