@@ -44,9 +44,8 @@ except ImportError as e:
     pass 
 
 try:
-    from StringIO import StringIO
+    import StringIO # py2
 except ImportError:
-    #from io import StringIO
     import io as StringIO
 
 
