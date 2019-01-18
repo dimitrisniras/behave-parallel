@@ -1165,7 +1165,7 @@ class Examples(TagStatement, Replayable):
         self.table = table
         self.index = None
 
-     def reset(self):
+    def reset(self):
         '''Reset temporary runtime data to reach clean state again.'''
         self.status = 'untested'
         self.duration = 0.0
@@ -1313,7 +1313,6 @@ class Step(BasicStatement, Replayable):
         # self.status = Status.untested
         # self.hook_failed = False
         self.reset()
-
         match = runner.step_registry.find_match(self)
         if match is None:
             runner.undefined_steps.append(self)

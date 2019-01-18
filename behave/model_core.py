@@ -87,6 +87,15 @@ class Status(Enum):
             raise LookupError("%s (expected: %s)" % (name, known_names))
         return enum_value
 
+    @classmethod
+    def to_name(cls, i):
+        try:
+            return ["untested","skipped","passed","failed","undefined","executing"][i]
+        except:
+            return "undefined"
+
+
+
 
 class Argument(object):
     """An argument found in a *feature file* step name and extracted using

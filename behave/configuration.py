@@ -7,7 +7,7 @@ import os
 import re
 import sys
 import argparse
-import ConfigParser
+import configparser
 import logging
 import shlex
 import six
