@@ -876,8 +876,8 @@ class Runner(ModelRunner):
         failed_count = 0
 
         # -- ENSURE: context.execute_steps() works in weird cases (hooks, ...)
-        self.setup_capture()
-        self.run_hook('before_all', context)
+        # self.setup_capture()
+        # self.run_hook('before_all', context)
 
         # -- STEP: Parse all feature files (by using their file location).
         feature_locations = [filename for filename in self.feature_locations()
@@ -954,6 +954,12 @@ class Runner(ModelRunner):
                 " -t option was given..."
                .format(scenario_count, feature_count, proc_count))
         time.sleep(2)
+
+        #self.hook_failures = 0
+
+        # MARK:
+        self.setup_capture()
+        self.run_hook("before_all", self.context)
 
         procs = []
         for i in range(proc_count):
