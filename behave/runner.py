@@ -1311,39 +1311,39 @@ class Runner(ModelRunner):
             fd.write(filedata)
             fd.close() 
 
-    def setup_capture(self):
-        if self.config.stdout_capture:
-            self.stdout_capture = StringIO.StringIO()
-            self.context.stdout_capture = self.stdout_capture
+    # def setup_capture(self):
+    #     if self.config.stdout_capture:
+    #         self.stdout_capture = StringIO.StringIO()
+    #         self.context.stdout_capture = self.stdout_capture
 
-        if self.config.stderr_capture:
-            self.stderr_capture = StringIO.StringIO()
-            self.context.stderr_capture = self.stderr_capture
+    #     if self.config.stderr_capture:
+    #         self.stderr_capture = StringIO.StringIO()
+    #         self.context.stderr_capture = self.stderr_capture
 
-        if self.config.log_capture:
-            self.log_capture = LoggingCapture(self.config)
-            self.log_capture.inveigle()
-            self.context.log_capture = self.log_capture
+    #     if self.config.log_capture:
+    #         self.log_capture = LoggingCapture(self.config)
+    #         self.log_capture.inveigle()
+    #         self.context.log_capture = self.log_capture
 
-    def start_capture(self):
-        if self.config.stdout_capture:
-            self.old_stdout = sys.stdout
-            sys.stdout = self.stdout_capture
+    # def start_capture(self):
+    #     if self.config.stdout_capture:
+    #         self.old_stdout = sys.stdout
+    #         sys.stdout = self.stdout_capture
 
-        if self.config.stderr_capture:
-            self.old_stderr = sys.stderr
-            sys.stderr = self.stderr_capture
+    #     if self.config.stderr_capture:
+    #         self.old_stderr = sys.stderr
+    #         sys.stderr = self.stderr_capture
 
-    def stop_capture(self):
-        if self.config.stdout_capture:
-            sys.stdout = self.old_stdout
+    # def stop_capture(self):
+    #     if self.config.stdout_capture:
+    #         sys.stdout = self.old_stdout
 
-        if self.config.stderr_capture:
-            sys.stderr = self.old_stderr
+    #     if self.config.stderr_capture:
+    #         sys.stderr = self.old_stderr
 
-    def teardown_capture(self):
-        if self.config.log_capture:
-            self.log_capture.abandon()
+    # def teardown_capture(self):
+    #     if self.config.log_capture:
+    #         self.log_capture.abandon()
 
     def clean_buffer(self, buf):
         return 
