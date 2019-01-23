@@ -984,8 +984,6 @@ class Runner(ModelRunner):
             self.config.outputs.append(StreamOpener(stream=writebuf))
 
             stream_openers = self.config.outputs
-            # self.formatters = formatters.get_formatter(self.config, stream_openers)
-            stream_openers = self.config.outputs
             self.formatters = make_formatters(self.config, stream_openers)
 
             for formatter in self.formatters:
