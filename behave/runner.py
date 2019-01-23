@@ -1028,6 +1028,7 @@ class Runner(ModelRunner):
                         results['junit_report'] = \
                         self.generate_junit_report(current_job, writebuf)
                 self.resultsqueue.put(results)
+                writebuf.close()
 
     def setfeature(self, current_job):
         if current_job.type == 'feature':
