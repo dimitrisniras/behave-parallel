@@ -993,7 +993,8 @@ class Runner(ModelRunner):
             current_job.run(self)
             end_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
-            sys.stderr.write(str(current_job.status)+"\n")
+            if self.config.show_skipped or (not self.config.show_skipped and not str(current_job.status) == "Status.skipped"):
+                sys.stderr.write(str(current_job.status)+"\n")
 
             if current_job.type == 'feature':
                 for reporter in self.config.reporters:
@@ -1039,7 +1040,10 @@ class Runner(ModelRunner):
     def generatereport(self, proc_number, current_job, start_time, end_time, writebuf):
         # MARK
         #if not writebuf.pos:
-            #return u""
+        #return u""
+        
+        if not self.config.show_skipped and str(current_job.status) == "Status.skipped":
+            return ""
 
         reportheader = start_time + "|WORKER" + str(proc_number) + " START|" + \
         "status:" + str(current_job.status) + "|" + current_job.filename + "\n"
