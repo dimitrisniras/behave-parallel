@@ -545,7 +545,7 @@ class Configuration(object):
     defaults = dict(
         color=sys.platform != "win32",
         show_snippets=True,
-        show_skipped=True,
+        show_skipped=False,
         dry_run=False,
         show_source=True,
         show_timings=True,
